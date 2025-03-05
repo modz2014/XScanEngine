@@ -177,11 +177,15 @@ QString XScanEngine::createShortResultString(XScanEngine::SCAN_OPTIONS *pOptions
     return sResult;
 }
 
-Qt::GlobalColor XScanEngine::typeToColor(const QString &sType) {
-    static const QMap<QString, Qt::GlobalColor> colorMap = {
-        {"installer", Qt::blue},
-        {"sfx", Qt::blue},
-        {"archive", Qt::blue},
+QColor XScanEngine::typeToColor(const QString& sType)
+{
+    QString _sType = sType.toLower().remove("~").remove("!");
+    QColor result = Qt::transparent;
+
+    static const QMap<QString, QColor> typeToColorMap = {
+        {"installer", QColor(102, 161, 231)},
+        {"sfx", QColor(102, 161, 231)},
+        {"archive", QColor(102, 161, 231)},
         {"pe tool", Qt::green},
         {"apk tool", Qt::green},
         {"operation system", Qt::darkYellow},
@@ -189,24 +193,26 @@ Qt::GlobalColor XScanEngine::typeToColor(const QString &sType) {
         {"platform", Qt::darkYellow},
         {"dos extender", Qt::darkYellow},
         {"format", Qt::darkGreen},
-        {"sign tool", Qt::darkMagenta},
-        {"certificate", Qt::darkMagenta},
-        {"licensing", Qt::darkMagenta},
+        {"sign tool", Qt::magenta},
+        {"certificate", Qt::magenta},
+        {"licensing", Qt::magenta},
         {"language", Qt::darkCyan},
         {"virus", Qt::darkRed},
         {"trojan", Qt::darkRed},
         {"malware", Qt::darkRed},
-        {"debug", Qt::darkBlue},
-        {"debug data", Qt::darkBlue}
+        {"corrupted data", Qt::darkRed},
+        {"debug", QColor(30, 144, 255)},
+        {"debug data", QColor(30, 144, 255)}
     };
 
-    QString _sType = sType.toLower().remove("~").remove("!");
-
-    if (isProtection(_sType)) {
-        return Qt::red;
+    if (typeToColorMap.contains(_sType)) {
+        result = typeToColorMap.value(_sType);
+    }
+    else if (isProtection(_sType)) {
+        result = Qt::red;
     }
 
-    return colorMap.value(_sType, Qt::transparent);
+    return result;
 }
 
 qint32 XScanEngine::typeToPrio(const QString &sType) {
